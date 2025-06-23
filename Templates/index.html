@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>YouTube Poll</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4fbf4;
+      color: #2f4f2f;
+    }
+
+    header {
+      background: #a8e6a3;
+      color: #1b3b1b;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      position: relative;
+    }
+
+    .back-btn {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+      background: transparent;
+      border: none;
+      color: #1b3b1b;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: bold;
+      display: none;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 30px auto;
+      background: white;
+      padding: 30px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 12px;
+    }
+
+    .points p {
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      margin: 15px 0;
+    }
+
+    .points p.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .start-btn {
+      background-color: #6bbf59;
+      color: white;
+      padding: 10px 25px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+      display: none;
+    }
+
+    .start-btn.show {
+      display: inline-block;
+    }
+
+    .input-section {
+      display: none;
+      margin-top: 20px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-top: 10px;
+    }
+
+    .chart-section {
+      margin-top: 30px;
+      text-align: center;
+      display: none;
+    }
+    .chart-section .thumbnail {
+      width: 380px;
+      height: 300px;
+      border-radius: 16px;
+      background-color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .chart-grid {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .thumbnail, .chart {
+      width: 200px;
+      height: 200px;
+      flex-shrink: 0;
+      border-radius: 10px;
+      overflow: hidden;
+      background-color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 10px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.2);
+    }
+
+    .chart canvas {
+      width: 100%;
+      height: 100%;
+      aspect-ratio: 1 / 1;
+    }
+
+    .legend {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 20px;
+      font-size: 20px;
+    }
+    .chart-section .container {
+    max-width: 1000px;
+    margin: 30px auto;
+    background: white;
+    padding: 40px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    border-radius: 20px;
+    }
+    .chart-section .chart-grid {
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+    .chart-section .chart {
+       width: 300px;
+       height: 300px;
+       border-radius: 16px;
+       background-color: white;
+       display: flex;
+       justify-content: center;
+       align-items: center;
+      }
+      .chart-section h3 {
+        font-size: 26px;
+        margin-bottom: 20px;
+      }
+
+    #videoHelp {
+        opacity: 0;
+        transform: translateY(10px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    #videoHelp.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .video-id-help {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .video-id-help img {
+      max-width: 100%;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+
+
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body>
+
+  <header id="header">
+    <button class="back-btn" id="backBtn" onclick="goBack()">← Back</button>
+    YouTube Poll
+  </header>
+
+  <div class="container">
+    <!-- Home Section -->
+    <div class="points" id="welcomeText">
+      <p id="point1">Welcome to <strong>YouTube Poll</strong></p>
+      <p id="point2">Want to know the public's opinion ?</p>
+      <p id="point3">Have a YouTube video ID ready!</p>
+      <div class="video-id-help" id="videoHelp">
+        <h4>Where to find the YouTube Video ID?</h4>
+        <img src="{{ url_for('static', filename='picture_pointing.jpg') }}" alt="Where to find YouTube Video ID" />
+        <p style="font-size: 14px; color: gray;">(Video ID is the part after <code>v=</code> in the URL)</p>
+      </div>
+      <p id="point4">Click the button below to get started.</p>
+      <button class="start-btn" id="startBtn" onclick="showInput()">Start</button>
+    </div>
+
+    <!-- Input Section -->
+    <div class="input-section" id="inputSection">
+      <label for="videoId">Paste your YouTube Video ID:</label>
+      <input type="text" id="videoId" placeholder="e.g. dQw4w9WgXcQ">
+      <button class="start-btn show" onclick="generateChart()">Generate Sentiment</button>
+    </div>
+
+    <!-- Result Section -->
+    <div class="chart-section" id="chartSection">
+      <h3>Sentiment Analysis Result</h3>
+      <div class="chart-grid">
+        <div class="thumbnail">
+          <img id="videoThumbnail" src="" alt="Video Thumbnail">
+        </div>
+        <div class="chart">
+          <canvas id="pieChart"></canvas>
+        </div>
+      </div>
+      <div class="legend">
+        <div>😊 <span id="positiveVal">--</span>%</div>
+        <div>😐 <span id="neutralVal">--</span>%</div>
+        <div>😞 <span id="negativeVal">--</span>%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart.js Library -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    const pointIds = ["point1", "point2", "point3", "videoHelp", "point4"];
+    let currentPage = "home";
+
+    window.addEventListener('load', () => {
+      let delay = 0;
+      pointIds.forEach((id, index) => {
+        delay += 1000;
+        setTimeout(() => {
+          document.getElementById(id).classList.add("visible");
+          if (index === pointIds.length - 1) {
+            document.getElementById("startBtn").classList.add("show");
+          }
+        }, delay);
+      });
+    });
+
+    function showInput() {
+      currentPage = "input";
+      document.getElementById("welcomeText").style.display = "none";
+      document.getElementById("inputSection").style.display = "block";
+      document.getElementById("backBtn").style.display = "inline-block";
+    }
+
+    function generateChart() {
+      const id = document.getElementById("videoId").value.trim();
+      if (!id) {
+        alert("Please enter a valid YouTube video ID.");
+        return;
+      }
+      currentPage = "chart";
+      document.getElementById("inputSection").style.display = "none";
+      document.getElementById("chartSection").style.display = "block";
+      document.getElementById("backBtn").style.display = "inline-block";
+
+      fetch('/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ videoId: id })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+
+        document.getElementById("videoThumbnail").src = data.thumbnail_url;
+        document.getElementById("positiveVal").innerText = data.positive;
+        document.getElementById("neutralVal").innerText = data.neutral;
+        document.getElementById("negativeVal").innerText = data.negative;
+
+        const ctx = document.getElementById("pieChart").getContext("2d");
+        new Chart(ctx, {
+          type: "pie",
+          data: {
+            labels: ["Positive", "Neutral", "Negative"],
+            datasets: [{
+              data: [data.positive, data.neutral, data.negative],
+              backgroundColor: ["limegreen", "skyblue", "red"]
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+              animateRotate: true,
+              animateScale: true,
+              duration: 1500,
+              easing: 'easeOutCirc'
+            },
+            plugins: {
+              legend: {
+                position: 'bottom'
+              }
+            }
+          }
+        });
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to analyze video.');
+      });
+    }
+
+    function goBack() {
+      if (currentPage === "input") {
+        currentPage = "home";
+        document.getElementById("welcomeText").style.display = "block";
+        document.getElementById("inputSection").style.display = "none";
+        document.getElementById("backBtn").style.display = "none";
+        document.getElementById("videoId").value = "";
+      } else if (currentPage === "chart") {
+        currentPage = "input";
+        document.getElementById("chartSection").style.display = "none";
+        document.getElementById("inputSection").style.display = "block";
+        document.getElementById("videoId").value = "";
+      }
+    }
+  </script>
+
+</body>
+</html>
+
+ 
