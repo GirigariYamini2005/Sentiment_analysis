@@ -16,7 +16,7 @@ from nltk.tokenize import PunktTokenizer
 import matplotlib
 matplotlib.use('Agg')  # Use non-GUI backend for servers or CLI
 
-#nltk.download('punkt')
+nltk.download('punkt')
 nltk.download('punkt_tab')
 nltk.download('stopwords')
 
